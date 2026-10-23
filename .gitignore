@@ -1,0 +1,42 @@
+# ROS 2 / colcon outputs and test recordings
+/build/
+/install/
+/log/
+/logs/
+/test_runs/
+/recordings/
+/bags/
+*.bag
+*.db3
+*.db3-shm
+*.db3-wal
+*.mcap
+
+# Python caches, environments and test reports
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+.coverage.*
+htmlcov/
+*.egg-info/
+.venv/
+venv/
+
+# Local credentials and machine-specific overrides
+.env
+.env.*
+!.env.example
+*.local.yaml
+*.local.yml
+
+# Editor and OS files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~

@@ -1,0 +1,724 @@
+{
+  "recovered_at": "2026-10-24T05:57:49.739871+09:00",
+  "repository_scope": "Standalone ROS 2 vehicle_recorder package only.",
+  "method": "Reconstructed package history from surviving complete and partial source snapshots. Original Git history did not exist. Commit timestamps are recovery timestamps; the original author and precise edit times are not inferred. Duplicate snapshots share commits.",
+  "excluded_ancestors": "monitor_1021 and vehicle_stop were separate predecessor packages; their separate project trees are not imported into this repository.",
+  "editor_history": "No matching vehicle_recorder entries found in the local or remote VS Code history stores.",
+  "historical_tip_before_repository_preparation": "b8c8d5b1b136165a0f00af1d67827ec3d1c6b1e6",
+  "current_source_files": {
+    "package.xml": {
+      "sha256": "3bc67ca5c1bb05d7b71b0df47cf7be6887c5327ec86d31f9da455ff877077e9f",
+      "executable": false
+    },
+    "README.md": {
+      "sha256": "fcd1edb83b6a59620cd9761e89bcf00b72a8761c0713b0dfd94cf61de9dd72f2",
+      "executable": false
+    },
+    "CMakeLists.txt": {
+      "sha256": "cac75bd4f2b0f359446061ae4d232ec0c59248eb460513ac09891042521a904d",
+      "executable": false
+    },
+    "scripts/record_terminal.py": {
+      "sha256": "8cf70e0afe6e352b55a1a7e787861ff0aa019faa5c63ce4708c0db1a439048d3",
+      "executable": false
+    },
+    "scripts/record": {
+      "sha256": "3a62c4d1aaa83cbbff47352fad26599adb42e90242cf82a56851be3cab74d8c2",
+      "executable": true
+    },
+    "scripts/stop_observer": {
+      "sha256": "d1fe812bd090ee0075f46355137e49eb3076ac4988df07d6be2ea2d8ed67289a",
+      "executable": true
+    },
+    "scripts/recorder_node.py": {
+      "sha256": "fb26b4ede525dec5fede8c6c0f5a91d7f27a1bfa0c51a5738d6673738233ac96",
+      "executable": false
+    },
+    "scripts/path_monitor.py": {
+      "sha256": "77bd890183b340f3b57b013185421d59aab764f239ef8ad35172e2c14bd117d5",
+      "executable": false
+    },
+    "scripts/run_recorder.py": {
+      "sha256": "147c40e0225c7ecde4c9dd81af6b96777b7572413ec0882b025e0b02336949f2",
+      "executable": false
+    },
+    "scripts/stop_observation.py": {
+      "sha256": "a988d20aeaf88e5fe38929d51f0210fc0fa3168dc8d0144c73fa42bf2d008577",
+      "executable": false
+    },
+    "msg/CommandEvent.msg": {
+      "sha256": "f62e1825bda5944d6d4e8023fe7d75a07c1ffb754c461cedfe5ea57d6cde17a5",
+      "executable": false
+    },
+    "msg/StopStatus.msg": {
+      "sha256": "57c628d13c7d22d10628114df10cf98ee58fb5a94db3965d7c527a8a9f2bdace",
+      "executable": false
+    },
+    "launch/stop_observer.xml": {
+      "sha256": "c70e4554d555f75a647a4b759dae31847afa032e11faec0b197b51b56c5e9226",
+      "executable": false
+    },
+    "launch/record.xml": {
+      "sha256": "4af57ba77c612435502cf4a48b82b23a4b44ba448f664b397174105936933330",
+      "executable": false
+    },
+    "config/record.yaml": {
+      "sha256": "e40a611a88f8ef2f6c9970b5af8d4d6acb6a5a86f84f2261d80001e82fed429f",
+      "executable": false
+    },
+    "test/record_terminal_smoke.py": {
+      "sha256": "d0d3e889af15cf70884aa52d651bdc08a02c714c0e7ff69bfbd3745a819dcb9f",
+      "executable": false
+    },
+    "test/stop_monitor_smoke_test.py": {
+      "sha256": "cf4698dab7237651f331e99b3528cf7fec85f10631f80506d19a02a832e79ce7",
+      "executable": false
+    },
+    "test/test_stop_observation.py": {
+      "sha256": "7eb07c8f79cced4f7541ede0f0bb1de9008293f907dce4090c66fcda80a529d1",
+      "executable": false
+    },
+    "test/test_recorder.py": {
+      "sha256": "471dedd238d427510502311513ad6320a6470b17ba9c3278b546f6c00f4db6d3",
+      "executable": false
+    }
+  },
+  "snapshots": [
+    {
+      "source": "test_runs/display-recorder-20261021T152353/final-source/vehicle_recorder",
+      "snapshot_scope": "complete",
+      "commit": "cf55f2033c9f6c8739d62fc063455ca0c00f8f8e",
+      "created_commit": true,
+      "files": {
+        "CMakeLists.txt": {
+          "sha256": "a6f0fa0c86417349d72eea28aa229bc35ef59d7c1e5c74e6402e6d93014cb9b4",
+          "executable": false
+        },
+        "README.md": {
+          "sha256": "1b2ef0a1c2d62767d105d47b5b5df919a73416deb48b8332cc5a51c8a8837701",
+          "executable": false
+        },
+        "config/record.yaml": {
+          "sha256": "e40a611a88f8ef2f6c9970b5af8d4d6acb6a5a86f84f2261d80001e82fed429f",
+          "executable": false
+        },
+        "launch/record.xml": {
+          "sha256": "4af57ba77c612435502cf4a48b82b23a4b44ba448f664b397174105936933330",
+          "executable": false
+        },
+        "launch/stop_observer.xml": {
+          "sha256": "c70e4554d555f75a647a4b759dae31847afa032e11faec0b197b51b56c5e9226",
+          "executable": false
+        },
+        "msg/CommandEvent.msg": {
+          "sha256": "f62e1825bda5944d6d4e8023fe7d75a07c1ffb754c461cedfe5ea57d6cde17a5",
+          "executable": false
+        },
+        "msg/StopStatus.msg": {
+          "sha256": "57c628d13c7d22d10628114df10cf98ee58fb5a94db3965d7c527a8a9f2bdace",
+          "executable": false
+        },
+        "package.xml": {
+          "sha256": "3bc67ca5c1bb05d7b71b0df47cf7be6887c5327ec86d31f9da455ff877077e9f",
+          "executable": false
+        },
+        "scripts/path_monitor.py": {
+          "sha256": "77bd890183b340f3b57b013185421d59aab764f239ef8ad35172e2c14bd117d5",
+          "executable": false
+        },
+        "scripts/record": {
+          "sha256": "3a62c4d1aaa83cbbff47352fad26599adb42e90242cf82a56851be3cab74d8c2",
+          "executable": true
+        },
+        "scripts/recorder_node.py": {
+          "sha256": "1f7349994ad28163bbad032a9b382aa8a6d619a170715d43cdf5dd869d031180",
+          "executable": false
+        },
+        "scripts/run_recorder.py": {
+          "sha256": "bb2b4b285d0491a05bc3732b2a3f04d18b2b517cbeb180b3f260d9965800caee",
+          "executable": false
+        },
+        "scripts/stop_observation.py": {
+          "sha256": "a988d20aeaf88e5fe38929d51f0210fc0fa3168dc8d0144c73fa42bf2d008577",
+          "executable": false
+        },
+        "scripts/stop_observer": {
+          "sha256": "d1fe812bd090ee0075f46355137e49eb3076ac4988df07d6be2ea2d8ed67289a",
+          "executable": true
+        },
+        "test/stop_monitor_smoke_test.py": {
+          "sha256": "cf4698dab7237651f331e99b3528cf7fec85f10631f80506d19a02a832e79ce7",
+          "executable": false
+        },
+        "test/test_recorder.py": {
+          "sha256": "ce9707729c72669def184f67e13f196768fedf663ee02792f095c4306aedb4e3",
+          "executable": false
+        },
+        "test/test_stop_observation.py": {
+          "sha256": "7eb07c8f79cced4f7541ede0f0bb1de9008293f907dce4090c66fcda80a529d1",
+          "executable": false
+        }
+      }
+    },
+    {
+      "source": "test_runs/display-recorder-20261021T152353/ws/src/vehicle_recorder",
+      "snapshot_scope": "complete",
+      "commit": "cf55f2033c9f6c8739d62fc063455ca0c00f8f8e",
+      "created_commit": false,
+      "files": {
+        "CMakeLists.txt": {
+          "sha256": "a6f0fa0c86417349d72eea28aa229bc35ef59d7c1e5c74e6402e6d93014cb9b4",
+          "executable": false
+        },
+        "README.md": {
+          "sha256": "1b2ef0a1c2d62767d105d47b5b5df919a73416deb48b8332cc5a51c8a8837701",
+          "executable": false
+        },
+        "config/record.yaml": {
+          "sha256": "e40a611a88f8ef2f6c9970b5af8d4d6acb6a5a86f84f2261d80001e82fed429f",
+          "executable": false
+        },
+        "launch/record.xml": {
+          "sha256": "4af57ba77c612435502cf4a48b82b23a4b44ba448f664b397174105936933330",
+          "executable": false
+        },
+        "launch/stop_observer.xml": {
+          "sha256": "c70e4554d555f75a647a4b759dae31847afa032e11faec0b197b51b56c5e9226",
+          "executable": false
+        },
+        "msg/CommandEvent.msg": {
+          "sha256": "f62e1825bda5944d6d4e8023fe7d75a07c1ffb754c461cedfe5ea57d6cde17a5",
+          "executable": false
+        },
+        "msg/StopStatus.msg": {
+          "sha256": "57c628d13c7d22d10628114df10cf98ee58fb5a94db3965d7c527a8a9f2bdace",
+          "executable": false
+        },
+        "package.xml": {
+          "sha256": "3bc67ca5c1bb05d7b71b0df47cf7be6887c5327ec86d31f9da455ff877077e9f",
+          "executable": false
+        },
+        "scripts/path_monitor.py": {
+          "sha256": "77bd890183b340f3b57b013185421d59aab764f239ef8ad35172e2c14bd117d5",
+          "executable": false
+        },
+        "scripts/record": {
+          "sha256": "3a62c4d1aaa83cbbff47352fad26599adb42e90242cf82a56851be3cab74d8c2",
+          "executable": true
+        },
+        "scripts/recorder_node.py": {
+          "sha256": "1f7349994ad28163bbad032a9b382aa8a6d619a170715d43cdf5dd869d031180",
+          "executable": false
+        },
+        "scripts/run_recorder.py": {
+          "sha256": "bb2b4b285d0491a05bc3732b2a3f04d18b2b517cbeb180b3f260d9965800caee",
+          "executable": false
+        },
+        "scripts/stop_observation.py": {
+          "sha256": "a988d20aeaf88e5fe38929d51f0210fc0fa3168dc8d0144c73fa42bf2d008577",
+          "executable": false
+        },
+        "scripts/stop_observer": {
+          "sha256": "d1fe812bd090ee0075f46355137e49eb3076ac4988df07d6be2ea2d8ed67289a",
+          "executable": true
+        },
+        "test/stop_monitor_smoke_test.py": {
+          "sha256": "cf4698dab7237651f331e99b3528cf7fec85f10631f80506d19a02a832e79ce7",
+          "executable": false
+        },
+        "test/test_recorder.py": {
+          "sha256": "ce9707729c72669def184f67e13f196768fedf663ee02792f095c4306aedb4e3",
+          "executable": false
+        },
+        "test/test_stop_observation.py": {
+          "sha256": "7eb07c8f79cced4f7541ede0f0bb1de9008293f907dce4090c66fcda80a529d1",
+          "executable": false
+        }
+      }
+    },
+    {
+      "source": "test_runs/remote-brake-20261021T172630/before/main/src/vehicle_recorder",
+      "snapshot_scope": "partial",
+      "commit": "cf55f2033c9f6c8739d62fc063455ca0c00f8f8e",
+      "created_commit": false,
+      "files": {
+        "scripts/recorder_node.py": {
+          "sha256": "1f7349994ad28163bbad032a9b382aa8a6d619a170715d43cdf5dd869d031180",
+          "executable": false
+        }
+      }
+    },
+    {
+      "source": "test_runs/remote-brake-20261021T172630/final-source/main/src/vehicle_recorder",
+      "snapshot_scope": "partial",
+      "commit": "4596af8805cb885e8972992e23c38b86dac75bb7",
+      "created_commit": true,
+      "files": {
+        "scripts/recorder_node.py": {
+          "sha256": "d2af271058cb7568ca432f629a6fa800b138f70b9dc28eed3f4ed7287a448e52",
+          "executable": false
+        }
+      }
+    },
+    {
+      "source": "test_runs/recorder-q-review-20261022T200421/before/main/src/vehicle_recorder",
+      "snapshot_scope": "partial",
+      "commit": "4596af8805cb885e8972992e23c38b86dac75bb7",
+      "created_commit": false,
+      "files": {
+        "CMakeLists.txt": {
+          "sha256": "a6f0fa0c86417349d72eea28aa229bc35ef59d7c1e5c74e6402e6d93014cb9b4",
+          "executable": false
+        },
+        "README.md": {
+          "sha256": "1b2ef0a1c2d62767d105d47b5b5df919a73416deb48b8332cc5a51c8a8837701",
+          "executable": false
+        },
+        "scripts/recorder_node.py": {
+          "sha256": "d2af271058cb7568ca432f629a6fa800b138f70b9dc28eed3f4ed7287a448e52",
+          "executable": false
+        },
+        "scripts/run_recorder.py": {
+          "sha256": "bb2b4b285d0491a05bc3732b2a3f04d18b2b517cbeb180b3f260d9965800caee",
+          "executable": false
+        }
+      }
+    },
+    {
+      "source": "test_runs/recorder-q-review-20261022T200421/after/main/src/vehicle_recorder",
+      "snapshot_scope": "partial",
+      "commit": "9447a103ae5003b63e08dc2eca173e24e1ff2d7e",
+      "created_commit": true,
+      "files": {
+        "CMakeLists.txt": {
+          "sha256": "cac75bd4f2b0f359446061ae4d232ec0c59248eb460513ac09891042521a904d",
+          "executable": false
+        },
+        "README.md": {
+          "sha256": "5435692594d2d295da5f3b5c85d3fc34c6436b404cafd667fa6b5830b9d45d83",
+          "executable": false
+        },
+        "scripts/record_terminal.py": {
+          "sha256": "8cf70e0afe6e352b55a1a7e787861ff0aa019faa5c63ce4708c0db1a439048d3",
+          "executable": false
+        },
+        "scripts/recorder_node.py": {
+          "sha256": "fb26b4ede525dec5fede8c6c0f5a91d7f27a1bfa0c51a5738d6673738233ac96",
+          "executable": false
+        },
+        "scripts/run_recorder.py": {
+          "sha256": "147c40e0225c7ecde4c9dd81af6b96777b7572413ec0882b025e0b02336949f2",
+          "executable": false
+        },
+        "test/record_terminal_smoke.py": {
+          "sha256": "c72f762365c608ac9caf460abc161349eff29fa71d62b163b5a56ec49e440e7a",
+          "executable": false
+        },
+        "test/test_recorder.py": {
+          "sha256": "471dedd238d427510502311513ad6320a6470b17ba9c3278b546f6c00f4db6d3",
+          "executable": false
+        }
+      }
+    },
+    {
+      "source": "test_runs/recorder-q-review-20261022T200421/ws/src/vehicle_recorder",
+      "snapshot_scope": "complete",
+      "commit": "9447a103ae5003b63e08dc2eca173e24e1ff2d7e",
+      "created_commit": false,
+      "files": {
+        "CMakeLists.txt": {
+          "sha256": "cac75bd4f2b0f359446061ae4d232ec0c59248eb460513ac09891042521a904d",
+          "executable": false
+        },
+        "README.md": {
+          "sha256": "5435692594d2d295da5f3b5c85d3fc34c6436b404cafd667fa6b5830b9d45d83",
+          "executable": false
+        },
+        "config/record.yaml": {
+          "sha256": "e40a611a88f8ef2f6c9970b5af8d4d6acb6a5a86f84f2261d80001e82fed429f",
+          "executable": false
+        },
+        "launch/record.xml": {
+          "sha256": "4af57ba77c612435502cf4a48b82b23a4b44ba448f664b397174105936933330",
+          "executable": false
+        },
+        "launch/stop_observer.xml": {
+          "sha256": "c70e4554d555f75a647a4b759dae31847afa032e11faec0b197b51b56c5e9226",
+          "executable": false
+        },
+        "msg/CommandEvent.msg": {
+          "sha256": "f62e1825bda5944d6d4e8023fe7d75a07c1ffb754c461cedfe5ea57d6cde17a5",
+          "executable": false
+        },
+        "msg/StopStatus.msg": {
+          "sha256": "57c628d13c7d22d10628114df10cf98ee58fb5a94db3965d7c527a8a9f2bdace",
+          "executable": false
+        },
+        "package.xml": {
+          "sha256": "3bc67ca5c1bb05d7b71b0df47cf7be6887c5327ec86d31f9da455ff877077e9f",
+          "executable": false
+        },
+        "scripts/path_monitor.py": {
+          "sha256": "77bd890183b340f3b57b013185421d59aab764f239ef8ad35172e2c14bd117d5",
+          "executable": false
+        },
+        "scripts/record": {
+          "sha256": "3a62c4d1aaa83cbbff47352fad26599adb42e90242cf82a56851be3cab74d8c2",
+          "executable": true
+        },
+        "scripts/record_terminal.py": {
+          "sha256": "8cf70e0afe6e352b55a1a7e787861ff0aa019faa5c63ce4708c0db1a439048d3",
+          "executable": false
+        },
+        "scripts/recorder_node.py": {
+          "sha256": "fb26b4ede525dec5fede8c6c0f5a91d7f27a1bfa0c51a5738d6673738233ac96",
+          "executable": false
+        },
+        "scripts/run_recorder.py": {
+          "sha256": "147c40e0225c7ecde4c9dd81af6b96777b7572413ec0882b025e0b02336949f2",
+          "executable": false
+        },
+        "scripts/stop_observation.py": {
+          "sha256": "a988d20aeaf88e5fe38929d51f0210fc0fa3168dc8d0144c73fa42bf2d008577",
+          "executable": false
+        },
+        "scripts/stop_observer": {
+          "sha256": "d1fe812bd090ee0075f46355137e49eb3076ac4988df07d6be2ea2d8ed67289a",
+          "executable": true
+        },
+        "test/record_terminal_smoke.py": {
+          "sha256": "c72f762365c608ac9caf460abc161349eff29fa71d62b163b5a56ec49e440e7a",
+          "executable": false
+        },
+        "test/stop_monitor_smoke_test.py": {
+          "sha256": "cf4698dab7237651f331e99b3528cf7fec85f10631f80506d19a02a832e79ce7",
+          "executable": false
+        },
+        "test/test_recorder.py": {
+          "sha256": "471dedd238d427510502311513ad6320a6470b17ba9c3278b546f6c00f4db6d3",
+          "executable": false
+        },
+        "test/test_stop_observation.py": {
+          "sha256": "7eb07c8f79cced4f7541ede0f0bb1de9008293f907dce4090c66fcda80a529d1",
+          "executable": false
+        }
+      }
+    },
+    {
+      "source": "test_runs/brake-rising-time-20261022T201037/ws/src/vehicle_recorder",
+      "snapshot_scope": "complete",
+      "commit": "9447a103ae5003b63e08dc2eca173e24e1ff2d7e",
+      "created_commit": false,
+      "files": {
+        "CMakeLists.txt": {
+          "sha256": "cac75bd4f2b0f359446061ae4d232ec0c59248eb460513ac09891042521a904d",
+          "executable": false
+        },
+        "README.md": {
+          "sha256": "5435692594d2d295da5f3b5c85d3fc34c6436b404cafd667fa6b5830b9d45d83",
+          "executable": false
+        },
+        "config/record.yaml": {
+          "sha256": "e40a611a88f8ef2f6c9970b5af8d4d6acb6a5a86f84f2261d80001e82fed429f",
+          "executable": false
+        },
+        "launch/record.xml": {
+          "sha256": "4af57ba77c612435502cf4a48b82b23a4b44ba448f664b397174105936933330",
+          "executable": false
+        },
+        "launch/stop_observer.xml": {
+          "sha256": "c70e4554d555f75a647a4b759dae31847afa032e11faec0b197b51b56c5e9226",
+          "executable": false
+        },
+        "msg/CommandEvent.msg": {
+          "sha256": "f62e1825bda5944d6d4e8023fe7d75a07c1ffb754c461cedfe5ea57d6cde17a5",
+          "executable": false
+        },
+        "msg/StopStatus.msg": {
+          "sha256": "57c628d13c7d22d10628114df10cf98ee58fb5a94db3965d7c527a8a9f2bdace",
+          "executable": false
+        },
+        "package.xml": {
+          "sha256": "3bc67ca5c1bb05d7b71b0df47cf7be6887c5327ec86d31f9da455ff877077e9f",
+          "executable": false
+        },
+        "scripts/path_monitor.py": {
+          "sha256": "77bd890183b340f3b57b013185421d59aab764f239ef8ad35172e2c14bd117d5",
+          "executable": false
+        },
+        "scripts/record": {
+          "sha256": "3a62c4d1aaa83cbbff47352fad26599adb42e90242cf82a56851be3cab74d8c2",
+          "executable": true
+        },
+        "scripts/record_terminal.py": {
+          "sha256": "8cf70e0afe6e352b55a1a7e787861ff0aa019faa5c63ce4708c0db1a439048d3",
+          "executable": false
+        },
+        "scripts/recorder_node.py": {
+          "sha256": "fb26b4ede525dec5fede8c6c0f5a91d7f27a1bfa0c51a5738d6673738233ac96",
+          "executable": false
+        },
+        "scripts/run_recorder.py": {
+          "sha256": "147c40e0225c7ecde4c9dd81af6b96777b7572413ec0882b025e0b02336949f2",
+          "executable": false
+        },
+        "scripts/stop_observation.py": {
+          "sha256": "a988d20aeaf88e5fe38929d51f0210fc0fa3168dc8d0144c73fa42bf2d008577",
+          "executable": false
+        },
+        "scripts/stop_observer": {
+          "sha256": "d1fe812bd090ee0075f46355137e49eb3076ac4988df07d6be2ea2d8ed67289a",
+          "executable": true
+        },
+        "test/record_terminal_smoke.py": {
+          "sha256": "c72f762365c608ac9caf460abc161349eff29fa71d62b163b5a56ec49e440e7a",
+          "executable": false
+        },
+        "test/stop_monitor_smoke_test.py": {
+          "sha256": "cf4698dab7237651f331e99b3528cf7fec85f10631f80506d19a02a832e79ce7",
+          "executable": false
+        },
+        "test/test_recorder.py": {
+          "sha256": "471dedd238d427510502311513ad6320a6470b17ba9c3278b546f6c00f4db6d3",
+          "executable": false
+        },
+        "test/test_stop_observation.py": {
+          "sha256": "7eb07c8f79cced4f7541ede0f0bb1de9008293f907dce4090c66fcda80a529d1",
+          "executable": false
+        }
+      }
+    },
+    {
+      "source": "test_runs/recorder-keep-support-20261022T201549/before/main/src/vehicle_recorder",
+      "snapshot_scope": "partial",
+      "commit": "9447a103ae5003b63e08dc2eca173e24e1ff2d7e",
+      "created_commit": false,
+      "files": {
+        "README.md": {
+          "sha256": "5435692594d2d295da5f3b5c85d3fc34c6436b404cafd667fa6b5830b9d45d83",
+          "executable": false
+        },
+        "test/record_terminal_smoke.py": {
+          "sha256": "c72f762365c608ac9caf460abc161349eff29fa71d62b163b5a56ec49e440e7a",
+          "executable": false
+        }
+      }
+    },
+    {
+      "source": "test_runs/recorder-keep-support-20261022T201549/after/main/src/vehicle_recorder",
+      "snapshot_scope": "partial",
+      "commit": "0bca826e7e0f0972157755087adb296052cb5f83",
+      "created_commit": true,
+      "files": {
+        "README.md": {
+          "sha256": "3838bf442e47b07fd214bb5e9499c0705f574b6216f01ddab5d2607162dbedaf",
+          "executable": false
+        },
+        "test/record_terminal_smoke.py": {
+          "sha256": "2a0a47c2caee7de89cbc90ce0768f099c0633dca645d753ae04553bc2c8735c8",
+          "executable": false
+        }
+      }
+    },
+    {
+      "source": "test_runs/recorder-auto-support-stop-20261022T201848/before/main/src/vehicle_recorder",
+      "snapshot_scope": "partial",
+      "commit": "0bca826e7e0f0972157755087adb296052cb5f83",
+      "created_commit": false,
+      "files": {
+        "README.md": {
+          "sha256": "3838bf442e47b07fd214bb5e9499c0705f574b6216f01ddab5d2607162dbedaf",
+          "executable": false
+        },
+        "test/record_terminal_smoke.py": {
+          "sha256": "2a0a47c2caee7de89cbc90ce0768f099c0633dca645d753ae04553bc2c8735c8",
+          "executable": false
+        }
+      }
+    },
+    {
+      "source": "test_runs/recorder-auto-support-stop-20261022T201848/after/main/src/vehicle_recorder",
+      "snapshot_scope": "partial",
+      "commit": "b8c8d5b1b136165a0f00af1d67827ec3d1c6b1e6",
+      "created_commit": true,
+      "files": {
+        "README.md": {
+          "sha256": "fcd1edb83b6a59620cd9761e89bcf00b72a8761c0713b0dfd94cf61de9dd72f2",
+          "executable": false
+        },
+        "test/record_terminal_smoke.py": {
+          "sha256": "d0d3e889af15cf70884aa52d651bdc08a02c714c0e7ff69bfbd3745a819dcb9f",
+          "executable": false
+        }
+      }
+    },
+    {
+      "source": "test_runs/oct22-measurement-ready-20261022T215031/final-source/vehicle_recorder",
+      "snapshot_scope": "complete",
+      "commit": "b8c8d5b1b136165a0f00af1d67827ec3d1c6b1e6",
+      "created_commit": false,
+      "files": {
+        "CMakeLists.txt": {
+          "sha256": "cac75bd4f2b0f359446061ae4d232ec0c59248eb460513ac09891042521a904d",
+          "executable": false
+        },
+        "README.md": {
+          "sha256": "fcd1edb83b6a59620cd9761e89bcf00b72a8761c0713b0dfd94cf61de9dd72f2",
+          "executable": false
+        },
+        "config/record.yaml": {
+          "sha256": "e40a611a88f8ef2f6c9970b5af8d4d6acb6a5a86f84f2261d80001e82fed429f",
+          "executable": false
+        },
+        "launch/record.xml": {
+          "sha256": "4af57ba77c612435502cf4a48b82b23a4b44ba448f664b397174105936933330",
+          "executable": false
+        },
+        "launch/stop_observer.xml": {
+          "sha256": "c70e4554d555f75a647a4b759dae31847afa032e11faec0b197b51b56c5e9226",
+          "executable": false
+        },
+        "msg/CommandEvent.msg": {
+          "sha256": "f62e1825bda5944d6d4e8023fe7d75a07c1ffb754c461cedfe5ea57d6cde17a5",
+          "executable": false
+        },
+        "msg/StopStatus.msg": {
+          "sha256": "57c628d13c7d22d10628114df10cf98ee58fb5a94db3965d7c527a8a9f2bdace",
+          "executable": false
+        },
+        "package.xml": {
+          "sha256": "3bc67ca5c1bb05d7b71b0df47cf7be6887c5327ec86d31f9da455ff877077e9f",
+          "executable": false
+        },
+        "scripts/path_monitor.py": {
+          "sha256": "77bd890183b340f3b57b013185421d59aab764f239ef8ad35172e2c14bd117d5",
+          "executable": false
+        },
+        "scripts/record": {
+          "sha256": "3a62c4d1aaa83cbbff47352fad26599adb42e90242cf82a56851be3cab74d8c2",
+          "executable": true
+        },
+        "scripts/record_terminal.py": {
+          "sha256": "8cf70e0afe6e352b55a1a7e787861ff0aa019faa5c63ce4708c0db1a439048d3",
+          "executable": false
+        },
+        "scripts/recorder_node.py": {
+          "sha256": "fb26b4ede525dec5fede8c6c0f5a91d7f27a1bfa0c51a5738d6673738233ac96",
+          "executable": false
+        },
+        "scripts/run_recorder.py": {
+          "sha256": "147c40e0225c7ecde4c9dd81af6b96777b7572413ec0882b025e0b02336949f2",
+          "executable": false
+        },
+        "scripts/stop_observation.py": {
+          "sha256": "a988d20aeaf88e5fe38929d51f0210fc0fa3168dc8d0144c73fa42bf2d008577",
+          "executable": false
+        },
+        "scripts/stop_observer": {
+          "sha256": "d1fe812bd090ee0075f46355137e49eb3076ac4988df07d6be2ea2d8ed67289a",
+          "executable": true
+        },
+        "test/record_terminal_smoke.py": {
+          "sha256": "d0d3e889af15cf70884aa52d651bdc08a02c714c0e7ff69bfbd3745a819dcb9f",
+          "executable": false
+        },
+        "test/stop_monitor_smoke_test.py": {
+          "sha256": "cf4698dab7237651f331e99b3528cf7fec85f10631f80506d19a02a832e79ce7",
+          "executable": false
+        },
+        "test/test_recorder.py": {
+          "sha256": "471dedd238d427510502311513ad6320a6470b17ba9c3278b546f6c00f4db6d3",
+          "executable": false
+        },
+        "test/test_stop_observation.py": {
+          "sha256": "7eb07c8f79cced4f7541ede0f0bb1de9008293f907dce4090c66fcda80a529d1",
+          "executable": false
+        }
+      }
+    },
+    {
+      "source": "main/src/vehicle_recorder",
+      "snapshot_scope": "complete",
+      "commit": "b8c8d5b1b136165a0f00af1d67827ec3d1c6b1e6",
+      "created_commit": false,
+      "files": {
+        "CMakeLists.txt": {
+          "sha256": "cac75bd4f2b0f359446061ae4d232ec0c59248eb460513ac09891042521a904d",
+          "executable": false
+        },
+        "README.md": {
+          "sha256": "fcd1edb83b6a59620cd9761e89bcf00b72a8761c0713b0dfd94cf61de9dd72f2",
+          "executable": false
+        },
+        "config/record.yaml": {
+          "sha256": "e40a611a88f8ef2f6c9970b5af8d4d6acb6a5a86f84f2261d80001e82fed429f",
+          "executable": false
+        },
+        "launch/record.xml": {
+          "sha256": "4af57ba77c612435502cf4a48b82b23a4b44ba448f664b397174105936933330",
+          "executable": false
+        },
+        "launch/stop_observer.xml": {
+          "sha256": "c70e4554d555f75a647a4b759dae31847afa032e11faec0b197b51b56c5e9226",
+          "executable": false
+        },
+        "msg/CommandEvent.msg": {
+          "sha256": "f62e1825bda5944d6d4e8023fe7d75a07c1ffb754c461cedfe5ea57d6cde17a5",
+          "executable": false
+        },
+        "msg/StopStatus.msg": {
+          "sha256": "57c628d13c7d22d10628114df10cf98ee58fb5a94db3965d7c527a8a9f2bdace",
+          "executable": false
+        },
+        "package.xml": {
+          "sha256": "3bc67ca5c1bb05d7b71b0df47cf7be6887c5327ec86d31f9da455ff877077e9f",
+          "executable": false
+        },
+        "scripts/path_monitor.py": {
+          "sha256": "77bd890183b340f3b57b013185421d59aab764f239ef8ad35172e2c14bd117d5",
+          "executable": false
+        },
+        "scripts/record": {
+          "sha256": "3a62c4d1aaa83cbbff47352fad26599adb42e90242cf82a56851be3cab74d8c2",
+          "executable": true
+        },
+        "scripts/record_terminal.py": {
+          "sha256": "8cf70e0afe6e352b55a1a7e787861ff0aa019faa5c63ce4708c0db1a439048d3",
+          "executable": false
+        },
+        "scripts/recorder_node.py": {
+          "sha256": "fb26b4ede525dec5fede8c6c0f5a91d7f27a1bfa0c51a5738d6673738233ac96",
+          "executable": false
+        },
+        "scripts/run_recorder.py": {
+          "sha256": "147c40e0225c7ecde4c9dd81af6b96777b7572413ec0882b025e0b02336949f2",
+          "executable": false
+        },
+        "scripts/stop_observation.py": {
+          "sha256": "a988d20aeaf88e5fe38929d51f0210fc0fa3168dc8d0144c73fa42bf2d008577",
+          "executable": false
+        },
+        "scripts/stop_observer": {
+          "sha256": "d1fe812bd090ee0075f46355137e49eb3076ac4988df07d6be2ea2d8ed67289a",
+          "executable": true
+        },
+        "test/record_terminal_smoke.py": {
+          "sha256": "d0d3e889af15cf70884aa52d651bdc08a02c714c0e7ff69bfbd3745a819dcb9f",
+          "executable": false
+        },
+        "test/stop_monitor_smoke_test.py": {
+          "sha256": "cf4698dab7237651f331e99b3528cf7fec85f10631f80506d19a02a832e79ce7",
+          "executable": false
+        },
+        "test/test_recorder.py": {
+          "sha256": "471dedd238d427510502311513ad6320a6470b17ba9c3278b546f6c00f4db6d3",
+          "executable": false
+        },
+        "test/test_stop_observation.py": {
+          "sha256": "7eb07c8f79cced4f7541ede0f0bb1de9008293f907dce4090c66fcda80a529d1",
+          "executable": false
+        }
+      }
+    }
+  ]
+}

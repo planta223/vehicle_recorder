@@ -20,6 +20,46 @@
 CPU·메모리·디스크는 같은 컴퓨터에서 공유하므로 물리적 부하가 0이라는 뜻은 아니다.
 실차에서는 기록 전후 제어 주기·지터를 비교하고, 필요하면 CPU/디스크 자원을 추가 분리한다.
 
+## 독립 저장소 빌드와 실행
+
+이 저장소의 루트가 ROS 2 `vehicle_recorder` 패키지다. `control_manager`,
+`manual_control`, `trans`, 실차 로그와 지도 파일 자체는 이 저장소에 포함하지 않는다.
+ROS 2 Humble 환경에서 colcon 워크스페이스의 `src/vehicle_recorder`로 배치한다.
+
+```bash
+cd ~/vehicle_recorder_ws
+source /opt/ros/humble/setup.bash
+rosdep install --from-paths src --ignore-src -r -y
+colcon build --packages-select vehicle_recorder --symlink-install
+source install/setup.bash
+ros2 run vehicle_recorder record --ros-args \
+  --params-file src/vehicle_recorder/config/record.yaml \
+  -p log_root:=./log/vehicle_recorder
+```
+
+위 예시는 저장소를 `~/vehicle_recorder_ws/src/vehicle_recorder`에 clone한 뒤 실행한다.
+기본 설정의 `/workspace/log/...`는 기존 컨테이너용 경로이므로 독립 실행에서는
+위와 같이 `log_root`를 지정한다. 시험별 토픽과 `snapshot_files`는 자체 YAML로 설정한다.
+기록기가 구독하는 사용자 정의 메시지는 해당 메시지 패키지가 설치되어 있어야 한다.
+예를 들어 `/control/*`의 제어 메시지에는 `control_manager`, 피드백 메시지에는
+`encoder_motor`의 타입 정의가 필요하며, 이 저장소가 그 패키지를 자동 실행하지 않는다.
+
+아래 실행 절차의 `main/IF_YOU_WANT_TO_RUN/...` 경로는 기존 2026WS 워크스페이스의
+통합 실행 스크립트다. 독립 clone에는 포함되지 않으며 직접 `ros2 run` 또는
+이 패키지의 `record.xml` / `stop_observer.xml`을 사용한다.
+
+## 보존한 편집 이력
+
+기존 `.git` 이력은 없었으며, 2026-10-21~22에 보존된 소스 스냅샷에서 확인 가능한
+변경을 복구 커밋으로 재구성했다. 커밋 시각은 복구한 시각이며 원래 편집 시각이나
+작성자를 의미하지 않는다. 부분 백업은 실제 남아 있는 파일만 반영했고 동일한
+백업은 중복 커밋하지 않았다. 각 백업 경로, 파일 SHA-256, 대응 커밋은
+[history/recovery.json](history/recovery.json)에 기록했다.
+
+이번 저장소 초기화에는 원본 바이너리 기록 방식으로의 개편을 포함하지 않았다.
+현재 Python JSONL/CSV 기록기는 대형 경로 메시지를 반복 수신할 때 기록률이
+낮아질 수 있으며 `dropped=0`도 DDS 구독 이전의 모든 전달을 보장하지 않는다.
+
 ## 실행
 
 기존 main 컨테이너에 빌드한 뒤 사용한다.
