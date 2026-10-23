@@ -12,7 +12,8 @@ import time
 
 import rclpy
 from ament_index_python.packages import get_package_prefix
-from std_msgs.msg import Float64
+from std_msgs.msg import Float32MultiArray, Float64
+from vehicle_recorder.msg import CommandEvent, StopStatus
 
 
 assert os.environ.get('ROS_LOCALHOST_ONLY') == '1'
@@ -135,12 +136,32 @@ def run():
             process.send('y\n')
             process.wait_for('기록 이름을 입력해주세요.', spin)
             process.send('제동 시험\n')
+            process.wait_for('[record-2]: process has finished cleanly', spin)
+            # Recorder exit must leave stop observation and transmission running.
+            statuses, transmissions = [], []
+            status_sub = fixture.create_subscription(StopStatus, '/vehicle/stop_status', statuses.append, 10)
+            event_sub = fixture.create_subscription(CommandEvent, '/vehicle/command_events',
+                lambda m: transmissions.append(m) if m.command_topic == '/brake_test/preview_cmd'
+                and m.stage == CommandEvent.DRY_RUN else None, 100)
+            command_pub = fixture.create_publisher(Float32MultiArray, '/brake_test/preview_cmd', 10)
+            deadline = time.monotonic() + 8
+            while not (statuses and transmissions):
+                assert os.waitpid(process.pid, os.WNOHANG) == (0, 0), 'support launch exited with recorder'
+                assert time.monotonic() < deadline, 'support nodes stopped after recording ended'
+                command_pub.publish(Float32MultiArray(data=[0., 0., 1.]))
+                spin()
+                process.read()
+            fixture.destroy_subscription(status_sub)
+            fixture.destroy_subscription(event_sub)
+            fixture.destroy_publisher(command_pub)
+            assert 'trans-3]: process has finished cleanly' not in process.output.decode()
+            process.send('\x03')  # Explicitly stop the still-running support launch.
             process.finish(spin)
             path, meta = metadata(label)
             assert meta['record_name'] == '제동 시험' and path.parent.name.endswith('-제동 시험')
             assert all((path.parent / s['file']).exists() for s in meta['snapshots'])
             assert 'trans-3]: process has finished cleanly' in process.output.decode(), process.output.decode()
-            print('PASS launch /dev/tty review, snapshots and support shutdown', flush=True)
+            print('PASS launch review: observer/trans continue after recorder exit; explicit shutdown works', flush=True)
         finally:
             process.close()
 
