@@ -14,6 +14,7 @@ from rosidl_runtime_py.utilities import get_message
 
 from run_recorder import RunRecorder
 from path_monitor import PathMonitor
+from record_terminal import RecordTerminal
 
 
 # 고규범 수정 (2026-10-21): 원본 전체는 test_runs/remote-brake-*/before에 보존.
@@ -31,6 +32,7 @@ class RecorderNode(Node):
         self.topics = self.declare_parameter('topics', TOPICS).value
         root = self.declare_parameter('log_root', '/workspace/log/vehicle_recorder').value
         capacity = self.declare_parameter('record_queue_size', 4096).value
+        self.interactive_review = self.declare_parameter('interactive_review', True).value
         path = self.declare_parameter('reference_path_topic', '/control/reference_path').value
         snapshots = self.declare_parameter('snapshot_files', ['']).value
         source = Path(__file__).resolve().parent
@@ -80,11 +82,19 @@ def main():
     for signum in (signal.SIGINT, signal.SIGTERM):
         signal.signal(signum, lambda *_: stopping.set())
     node = None
+    terminal = None
+    quit_requested = False
     complete = True
     try:
         node = RecorderNode()
+        terminal = RecordTerminal(node.interactive_review)
+        if terminal.fd is not None:
+            terminal.write('기록 폴더: ' + str(node.recorder.directory) + '\nq: 기록 종료 및 정상 여부 확인\n')
         while rclpy.ok() and not stopping.is_set():
             rclpy.spin_once(node, timeout_sec=.1)
+            if terminal.quit_requested():
+                quit_requested = True
+                break
     except (KeyboardInterrupt, ExternalShutdownException):
         pass
     except Exception as error:
@@ -92,10 +102,20 @@ def main():
             node.recorder.errors.append('Recorder process failed: ' + str(error))
         raise
     finally:
-        if node is not None:
-            complete = node.recorder.close()
-            node.destroy_node()
-        if rclpy.ok():
-            rclpy.shutdown()
+        try:
+            if terminal is not None:
+                terminal.restore()
+            if node is not None:
+                complete = node.recorder.close()
+                node.destroy_node()
+            if rclpy.ok():
+                rclpy.shutdown()
+            if quit_requested and not stopping.is_set() and not node.recorder.thread.is_alive():
+                if not complete:
+                    terminal.write('\n주의: 기록 누락 또는 저장 오류가 있습니다. metadata.json을 확인해주세요.\n')
+                terminal.review(node.recorder, stopping)
+        finally:
+            if terminal is not None:
+                terminal.close()
     if not complete:
         raise SystemExit(1)

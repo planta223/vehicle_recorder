@@ -9,7 +9,7 @@ rosidl_generate_interfaces(${PROJECT_NAME}
   "msg/CommandEvent.msg" "msg/StopStatus.msg"
   DEPENDENCIES std_msgs builtin_interfaces)
 install(PROGRAMS scripts/stop_observer scripts/record DESTINATION lib/${PROJECT_NAME})
-install(FILES scripts/stop_observation.py scripts/recorder_node.py scripts/run_recorder.py scripts/path_monitor.py DESTINATION lib/${PROJECT_NAME})
+install(FILES scripts/stop_observation.py scripts/recorder_node.py scripts/run_recorder.py scripts/path_monitor.py scripts/record_terminal.py DESTINATION lib/${PROJECT_NAME})
 install(DIRECTORY launch config DESTINATION share/${PROJECT_NAME})
 install(FILES README.md DESTINATION share/${PROJECT_NAME})
 if(BUILD_TESTING)

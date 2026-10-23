@@ -44,13 +44,26 @@ standalone 결과 토픽은 `/vehicle/stop_status`, control_manager 결과는 `/
 
 ## 저장
 
+대화형 터미널(`docker exec -it main bash`)에서는 `q` 또는 `Q` 한 번으로 기록을
+종료한다. 대기 중인 파일 쓰기를 마친 뒤 `정상적인 기록입니까? y/n:`을 묻는다.
+`y`를 입력하면 `기록 이름을 입력해주세요.`가 표시되고, 입력한 이름을 기존 실행
+폴더명 뒤에 붙인다. 한글과 공백을 사용할 수 있으며 빈 이름·경로 구분자·제어문자는
+허용하지 않는다(UTF-8 120바이트 이내). `n`이면 이름을 묻지 않고 원본 폴더를 보존한다.
+`metadata.json`의 `review_status`는 `pending`/`accepted`/`rejected`, `record_name`은
+입력한 이름이다. 이는 writer의 누락·오류를 나타내는 `complete`와 별개의 운영자 평가다.
+`Ctrl+C`/SIGTERM이나 터미널 없는 자동 실행은 기존처럼 파일을 닫고 미검토로 남긴다.
+자동 실행에서 터미널 입력을 사용하지 않으려면 `-p interactive_review:=false`를 지정한다.
+launch 자식 노드도 `/dev/tty`를 통해 같은 대화형 터미널에서 조작할 수 있다.
+제동 시험 지원 launch에서는 시험 조작 터미널의 정지·종료를 확인한 뒤 기록을 종료한다.
+기록 검토가 끝나면 지원 launch의 정지 관측·trans도 종료된다.
+
 기본 `/workspace/log/vehicle_recorder/<실행별 폴더>/`는 호스트
 `main/log/vehicle_recorder/<실행별 폴더>/`에 보존된다.
 
 - `messages.jsonl`: 토픽·타입·원본 timestamp·수신 ROS/monotonic 시각과 메시지 값.
 - `topic-<hash>.csv`: 토픽/타입별 표. 중첩 필드는 점 표기, 배열은 JSON 문자열.
 - reference_path 이벤트: 실제 제어 경로의 좌표계·XY·해시를 내용 변경 시 보존.
-- `metadata.json`: 토픽/CSV 매핑, 코드 해시, Docker 정보, 누락·오류·완료 여부.
+- `metadata.json`: 토픽/CSV 매핑, 코드 해시, Docker 정보, 누락·오류·완료 여부, 정상 여부 선택·기록 이름.
 - `config/`: `snapshot_files`에 지정한 실제 설정·지도 사본.
 
 GNSS 원본, 제어 상태, PP 진단, 자동/선택/액추에이터 명령, 명령 발행/전송 시각,

@@ -46,7 +46,8 @@ class RunRecorder:
         self.metadata = dict(metadata, created_at=datetime.now().astimezone().isoformat(),
                              nonfinite_policy='JSON null; source validity is preserved',
                              clock='source_stamp_ns and received_ros_ns: ROS time; received_monotonic_ns: local monotonic',
-                             complete=False, snapshots=[], snapshot_errors=[])
+                             complete=False, review_status='pending', record_name=None,
+                             snapshots=[], snapshot_errors=[])
         for index, filename in enumerate(snapshot_files):
             try:
                 source = Path(filename)
@@ -145,3 +146,29 @@ class RunRecorder:
         self.stopping.set()
         self.thread.join(timeout=10)
         return not self.thread.is_alive() and not self.errors and not self.dropped
+
+    @staticmethod
+    def validate_name(name):
+        if (not name or name in ('.', '..') or any(c in '/\\' or ord(c) < 32 or ord(c) == 127 for c in name)
+                or len(name.encode('utf-8')) > 120):
+            raise ValueError('빈 이름·경로 구분자·제어문자는 사용할 수 없습니다. 120바이트 이내로 입력해주세요.')
+
+    def review(self, normal, name=None):
+        if self.thread.is_alive():
+            raise RuntimeError('기록 저장이 끝나기 전에는 검토할 수 없습니다.')
+        if normal:
+            self.validate_name(name)
+        self.metadata.update(review_status='accepted' if normal else 'rejected',
+                             record_name=name if normal else None,
+                             reviewed_at=datetime.now().astimezone().isoformat())
+        # The operator's assessment is separate from complete/dropped/errors.
+        temporary = self.metadata_path.with_suffix('.json.tmp')
+        temporary.write_text(json.dumps(self.metadata, ensure_ascii=False, indent=2) + '\n')
+        temporary.replace(self.metadata_path)
+        if normal:
+            target = self.directory.with_name(self.directory.name + '-' + name)
+            if target.exists():
+                raise FileExistsError(str(target))
+            self.directory.rename(target)
+            self.directory = target
+            self.metadata_path = target / 'metadata.json'

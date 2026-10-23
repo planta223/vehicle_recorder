@@ -13,6 +13,45 @@ from run_recorder import RunRecorder
 
 
 class RecorderTest(unittest.TestCase):
+    def test_named_review_preserves_messages_and_snapshot_paths(self):
+        with tempfile.TemporaryDirectory() as directory:
+            config = Path(directory) / 'settings.yaml'
+            config.write_text('fixture: true\n')
+            journal = RunRecorder(directory, {}, snapshot_files=[str(config)])
+            journal.message('/fixture', 'std_msgs/msg/Float64', Float64(data=3.), 1)
+            self.assertTrue(journal.close())
+            original = journal.directory
+            journal.review(True, '모터 RPM 1차')
+            self.assertFalse(original.exists())
+            self.assertTrue(journal.directory.name.endswith('-모터 RPM 1차'))
+            meta = json.loads(journal.metadata_path.read_text())
+            self.assertEqual(meta['review_status'], 'accepted')
+            self.assertEqual(meta['record_name'], '모터 RPM 1차')
+            self.assertTrue(meta['complete'])
+            self.assertTrue((journal.directory / meta['snapshots'][0]['file']).exists())
+            self.assertEqual(json.loads((journal.directory / 'messages.jsonl').read_text())['data']['data'], 3.)
+
+    def test_rejected_review_keeps_original_directory(self):
+        with tempfile.TemporaryDirectory() as directory:
+            journal = RunRecorder(directory, {})
+            journal.close()
+            original = journal.directory
+            journal.review(False)
+            self.assertEqual(original, journal.directory)
+            meta = json.loads(journal.metadata_path.read_text())
+            self.assertEqual(meta['review_status'], 'rejected')
+            self.assertIsNone(meta['record_name'])
+            self.assertTrue((original / 'messages.jsonl').exists())
+
+    def test_invalid_names_leave_run_unreviewed(self):
+        with tempfile.TemporaryDirectory() as directory:
+            journal = RunRecorder(directory, {})
+            journal.close()
+            for name in ('', '.', '..', '../escape', 'a/b', 'a\\b', 'a\x00b', 'a\nb', '가' * 41):
+                with self.subTest(name=name), self.assertRaises(ValueError):
+                    journal.review(True, name)
+            self.assertEqual(json.loads(journal.metadata_path.read_text())['review_status'], 'pending')
+
     def test_backpressure_is_bounded_and_reported(self):
         entered, release = threading.Event(), threading.Event()
 
