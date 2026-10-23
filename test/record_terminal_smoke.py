@@ -11,6 +11,7 @@ import termios
 import time
 
 import rclpy
+from bag_helpers import read_bag, bag_bytes
 from ament_index_python.packages import get_package_prefix
 from std_msgs.msg import Float64
 
@@ -101,8 +102,8 @@ def run():
                 process.send('Q' if answer == 'n' else 'q')
                 process.wait_for('정상적인 기록입니까? y/n:', spin)
                 path, meta = metadata(label)
-                journal_at_prompt = (path.parent / 'messages.jsonl').read_bytes()
-                rows = [json.loads(line) for line in journal_at_prompt.splitlines()]
+                journal_at_prompt = bag_bytes(path.parent)
+                rows = read_bag(path.parent)
                 assert any(row.get('data', {}).get('data') == 42.0 for row in rows), rows
                 assert meta['complete'] and meta['review_status'] == 'pending'
                 if answer == 'y':
@@ -118,7 +119,7 @@ def run():
                 path, meta = metadata(label)
                 assert meta['review_status'] == ('accepted' if answer == 'y' else 'rejected')
                 assert meta['record_name'] == ('모터 RPM 1차' if answer == 'y' else None)
-                assert (path.parent / 'messages.jsonl').read_bytes() == journal_at_prompt
+                assert bag_bytes(path.parent) == journal_at_prompt
                 if answer == 'n':
                     assert '기록 이름을 입력해주세요.' not in process.output.decode()
                 print('PASS', label, 'data flushed before prompt and preserved', flush=True)

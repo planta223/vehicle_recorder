@@ -1,0 +1,85 @@
+{
+  "date": "2026-10-24",
+  "timezone": "Asia/Seoul",
+  "baseline_commit": "f37480fb9085e2d5e303c4d7dc41541af8d327e2",
+  "image": "sha256:45f927a726b9a5b95bf1bfb42bbc4432363cda550f6a164f673a42ca60cb6778",
+  "fixture_sha256": "628a637b679a69a5fe526b7284d35e87ceb72f0fae67ed092349a78bbdeeb56f",
+  "comparison": "17 Oct-23 topic shapes and original rates, including 1217-point paths; 8-second CPU window; disposable same-image container, network none, isolated ROS domain",
+  "cpu_metric": "Recorder process tree CPU seconds / wall seconds *100; 100% equals one logical CPU. This is not total machine CPU or an on-vehicle measurement.",
+  "baseline_cpu_percent_one_core": 101.24975430466797,
+  "rosbag2_cpu_percent_one_core": 6.6252232923808165,
+  "recorder_cpu_reduction_percent": 93.45655370931071,
+  "gnss_window": {
+    "published": 160,
+    "baseline_recorded": 68,
+    "rosbag2_recorded": 160
+  },
+  "rosbag2_messages_published": 6346,
+  "rosbag2_messages_recorded": 6346,
+  "all_fields_and_float_bits_equal": true,
+  "cdr_exact_byte_test": {
+    "raw": {
+      "messages": 240,
+      "payload_bytes_identical": true,
+      "special_float_bits_preserved": true,
+      "full_path_points": 1217,
+      "receipts_aligned": true,
+      "metadata_complete": true
+    },
+    "overflow": {
+      "complete": false,
+      "errors": [
+        "Storage queue capacity exceeded; recording is incomplete (no overwrite permitted)"
+      ]
+    },
+    "disk_failure": {
+      "complete": false,
+      "errors": [
+        "Writer failed: basic_ios::clear: iostream error"
+      ]
+    }
+  },
+  "middleware_padding_note": "Middleware may rewrite CDR alignment padding between publication and subscription. All fields, order, sample counts and float bits match. Separate 240-message CDR test checks exact byte preservation as well.",
+  "scope": "No topic thinning, field removal, rounding, resampling, or path deduplication. Acquisition delivery outside tested intervals is not guaranteed by complete=true.",
+  "evidence_directory": "/home/baqu4/Workspaces/2026WS/test_runs/vehicle-recorder-rosbag2-20261024",
+  "measured_runtime_source_sha256": {
+    "src/record_backend.cpp": "e603b9b1f7463b23a694d62357982f75191dd4a2c57d1a9f9a40909bd2cccc5c",
+    "scripts/recorder_node.py": "a6c20e504b3c6154f54170c483f5226a1b35f30aa82051f875aa8269aa9d3f30",
+    "scripts/run_recorder.py": "4146dc4a5fac0ab9543dea67ebb041ee90ab748eddd587cbdbc51abf22182969"
+  },
+  "final_runtime_source_sha256": {
+    "src/record_backend.cpp": "e603b9b1f7463b23a694d62357982f75191dd4a2c57d1a9f9a40909bd2cccc5c",
+    "scripts/recorder_node.py": "165465d1b3f9aeb233eedea9639c62c2455bc59820a37d662e898f78bce949e8",
+    "scripts/run_recorder.py": "4146dc4a5fac0ab9543dea67ebb041ee90ab748eddd587cbdbc51abf22182969"
+  },
+  "post_benchmark_change": "Resolve the backend executable via ament index to support symlink-install; verified against the installed main build. The measured CDR/storage path is unchanged.",
+  "main_symlink_install_cdr_test": {
+    "raw": {
+      "messages": 240,
+      "payload_bytes_identical": true,
+      "special_float_bits_preserved": true,
+      "full_path_points": 1217,
+      "receipts_aligned": true,
+      "metadata_complete": true
+    },
+    "overflow": {
+      "complete": false,
+      "errors": [
+        "Storage queue capacity exceeded; recording is incomplete (no overwrite permitted)"
+      ]
+    },
+    "disk_failure": {
+      "complete": false,
+      "errors": [
+        "Writer failed: basic_ios::clear: iostream error"
+      ]
+    }
+  },
+  "other_validation": {
+    "unit_cases_passed": 12,
+    "terminal_cases_passed": 6,
+    "stop_monitor_loopback_regression": "passed; current float32-degree/float32-RPM/uint8-brake protocol",
+    "standalone_build": "passed",
+    "main_symlink_install_build": "passed"
+  }
+}

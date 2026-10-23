@@ -1,79 +1,31 @@
-"""Subscriber-only data recording; never waits in a control callback for disk or web I/O."""
+"""Session launcher. No high-rate ROS subscriptions or Python message conversion."""
 import hashlib
 import os
-import signal
-import threading
 from pathlib import Path
+import signal
+import subprocess
+import sys
+import threading
+import time
 
 import rclpy
-from rclpy.executors import ExternalShutdownException
+from ament_index_python.packages import get_package_prefix
 from rclpy.node import Node
 from rclpy.signals import SignalHandlerOptions
-from rclpy.qos import qos_profile_sensor_data
-from rosidl_runtime_py.utilities import get_message
+import yaml
 
 from run_recorder import RunRecorder
-from path_monitor import PathMonitor
 from record_terminal import RecordTerminal
 
-
-# 고규범 수정 (2026-10-21): 원본 전체는 test_runs/remote-brake-*/before에 보존.
-# TOPICS 시작은 ['/gnss/odom', '/control/global_pose', '/control/motion_state', ...]였음.
-# 고규범 신규 로직: 시험 이벤트도 기존 비동기 writer로 기록. 제어 명령 발행 없음.
 TOPICS = ['/vehicle/brake_test', '/gnss/odom', '/control/global_pose', '/control/motion_state',
           '/control/pp_diagnostic', '/control/auto_cmd', '/control/selected_cmd',
           '/control/actuator_raw', '/control/status', '/control/stop_status',
           '/vehicle/stop_status', '/vehicle/command_events', '/motor_feedback', '/steering_feedback']
 
 
-class RecorderNode(Node):
-    def __init__(self):
-        super().__init__('vehicle_recorder', enable_rosout=False)
-        self.topics = self.declare_parameter('topics', TOPICS).value
-        root = self.declare_parameter('log_root', '/workspace/log/vehicle_recorder').value
-        capacity = self.declare_parameter('record_queue_size', 4096).value
-        self.interactive_review = self.declare_parameter('interactive_review', True).value
-        path = self.declare_parameter('reference_path_topic', '/control/reference_path').value
-        snapshots = self.declare_parameter('snapshot_files', ['']).value
-        source = Path(__file__).resolve().parent
-        self.recorder = RunRecorder(root, dict(
-            node=self.get_name(), topics=list(self.topics), reference_path_topic=path,
-            record_queue_size=capacity, ROS_DOMAIN_ID=os.environ.get('ROS_DOMAIN_ID', '0'),
-            docker_image_id=os.environ.get('CONTROL_IMAGE_ID'),
-            container_id=os.environ.get('CONTROL_CONTAINER_ID', os.environ.get('HOSTNAME')),
-            source_sha256={p.name: hashlib.sha256(p.read_bytes()).hexdigest() for p in source.glob('*.py')}),
-            capacity=capacity, snapshot_files=[p for p in snapshots if p])
-        self.path_monitor = PathMonitor(self, path, self.recorder)
-        self.subscriptions_by_topic = {}
-        self.last_health = (0, 0, True)
-        self.create_timer(.5, self.discover)
-        self.create_timer(1., self.health)
-        self.discover()
-        self.get_logger().info('기록 폴더: ' + str(self.recorder.directory))
-
-    def discover(self):
-        graph = dict(self.get_topic_names_and_types())
-        for topic in self.topics:
-            if topic in self.subscriptions_by_topic:
-                continue
-            types = graph.get(topic, [])
-            if len(types) != 1:
-                continue
-            try:
-                cls = get_message(types[0])
-            except (ImportError, AttributeError, ValueError):
-                continue
-            type_name = types[0]
-            self.subscriptions_by_topic[topic] = self.create_subscription(
-                cls, topic, lambda msg, t=topic, typ=type_name:
-                    self.recorder.message(t, typ, msg, self.get_clock().now().nanoseconds),
-                qos_profile_sensor_data)
-
-    def health(self):
-        state = (self.recorder.dropped, len(self.recorder.errors), self.recorder.thread.is_alive())
-        if state != self.last_health and (state[0] or state[1] or not state[2]):
-            self.get_logger().error(f'Recording incomplete: dropped={state[0]} errors={state[1]} writer_alive={state[2]}')
-        self.last_health = state
+def read_report(directory):
+    path = directory / 'backend.yaml'
+    return yaml.safe_load(path.read_text()) if path.exists() else {}
 
 
 def main():
@@ -81,39 +33,81 @@ def main():
     stopping = threading.Event()
     for signum in (signal.SIGINT, signal.SIGTERM):
         signal.signal(signum, lambda *_: stopping.set())
-    node = None
-    terminal = None
+    session = child = terminal = node = None
     quit_requested = False
-    complete = True
+    complete = False
     try:
-        node = RecorderNode()
-        terminal = RecordTerminal(node.interactive_review)
+        node = Node('vehicle_recorder', enable_rosout=False)
+        values = {name: node.declare_parameter(name, default).value for name, default in dict(
+            topics=TOPICS, log_root='/workspace/log/vehicle_recorder', record_queue_size=4096,
+            record_queue_bytes=268435456, subscription_depth=4096, interactive_review=True,
+            reference_path_topic='/control/reference_path', snapshot_files=['']).items()}
+        backend = Path(get_package_prefix('vehicle_recorder')) / 'lib/vehicle_recorder/record_backend'
+        source = Path(__file__).resolve().parent
+        session = RunRecorder(values['log_root'], dict(
+            node=node.get_name(), effective_parameters=values, topics=list(values['topics']),
+            reference_path_topic=values['reference_path_topic'],
+            ROS_DOMAIN_ID=os.environ.get('ROS_DOMAIN_ID', '0'),
+            docker_image_id=os.environ.get('CONTROL_IMAGE_ID'),
+            container_id=os.environ.get('CONTROL_CONTAINER_ID', os.environ.get('HOSTNAME')),
+            source_sha256={p.name: hashlib.sha256(p.read_bytes()).hexdigest()
+                           for p in [*source.glob('*.py'), backend] if p.is_file()}),
+            snapshot_files=[p for p in values['snapshot_files'] if p])
+        # Root/default config and CLI overrides have already been resolved by rclpy.
+        parameters = {name: values[name] for name in ('topics', 'reference_path_topic',
+                      'record_queue_size', 'record_queue_bytes', 'subscription_depth')}
+        parameters['session_directory'] = str(session.directory.resolve())
+        config = session.directory / 'backend_parameters.yaml'
+        config.write_text(yaml.safe_dump({'/**': {'ros__parameters': parameters}}))
+        node.destroy_node()
+        node = None
+        rclpy.shutdown()
+        # Retain caller ROS remappings; explicit effective values are applied last.
+        child = subprocess.Popen([str(backend), *sys.argv[1:], '--ros-args', '--params-file', str(config)],
+                                 start_new_session=True)
+        # Announce the UI only after the backend installed its signal handlers and opened storage.
+        # An immediate q/Ctrl+C must not kill an uninitialized child before it can close the bag.
+        while child.poll() is None and not (session.directory / 'backend.yaml').exists():
+            time.sleep(.05)
+        terminal = RecordTerminal(values['interactive_review'])
+        text = '기록 폴더: ' + str(session.directory) + '\nq: 기록 종료 및 정상 여부 확인\n'
         if terminal.fd is not None:
-            terminal.write('기록 폴더: ' + str(node.recorder.directory) + '\nq: 기록 종료 및 정상 여부 확인\n')
-        while rclpy.ok() and not stopping.is_set():
-            rclpy.spin_once(node, timeout_sec=.1)
+            terminal.write(text)
+        else:
+            print(text, flush=True)
+        last_report_mtime = None
+        while child.poll() is None and not stopping.is_set():
             if terminal.quit_requested():
                 quit_requested = True
                 break
-    except (KeyboardInterrupt, ExternalShutdownException):
-        pass
-    except Exception as error:
-        if node is not None:
-            node.recorder.errors.append('Recorder process failed: ' + str(error))
-        raise
+            status = session.directory / 'backend.yaml'
+            modified = status.stat().st_mtime_ns if status.exists() else None
+            if modified != last_report_mtime:
+                report = read_report(session.directory)
+                session.preserve_interfaces([t['type'] for t in report.get('topics', {}).values()])
+                last_report_mtime = modified
+            stopping.wait(.1)
     finally:
+        if node is not None:
+            node.destroy_node()
+        if rclpy.ok():
+            rclpy.shutdown()
+        if terminal is not None:
+            terminal.restore()
+        if child is not None:
+            if child.poll() is None:
+                child.send_signal(signal.SIGINT)
+            # Drain every queued buffer; never kill the writer after an arbitrary timeout.
+            child.wait()
         try:
-            if terminal is not None:
-                terminal.restore()
-            if node is not None:
-                complete = node.recorder.close()
-                node.destroy_node()
-            if rclpy.ok():
-                rclpy.shutdown()
-            if quit_requested and not stopping.is_set() and not node.recorder.thread.is_alive():
-                if not complete:
-                    terminal.write('\n주의: 기록 누락 또는 저장 오류가 있습니다. metadata.json을 확인해주세요.\n')
-                terminal.review(node.recorder, stopping)
+            if session is not None:
+                report = read_report(session.directory)
+                session.preserve_interfaces([t['type'] for t in report.get('topics', {}).values()])
+                complete = session.close(report, child.returncode if child is not None else -1)
+                if quit_requested and not stopping.is_set():
+                    if not complete:
+                        terminal.write('\n주의: 기록 누락 또는 저장 오류가 있습니다. metadata.json을 확인해주세요.\n')
+                    terminal.review(session, stopping)
         finally:
             if terminal is not None:
                 terminal.close()

@@ -2,6 +2,8 @@
   ros__parameters:
     log_root: /workspace/log/vehicle_recorder
     record_queue_size: 4096
+    record_queue_bytes: 268435456
+    subscription_depth: 4096
     reference_path_topic: /control/reference_path
     snapshot_files: [""]
     topics:

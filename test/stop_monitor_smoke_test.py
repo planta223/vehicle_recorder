@@ -16,6 +16,7 @@ assert os.environ.get('ROS_LOCALHOST_ONLY') == '1'
 assert os.environ.get('CONTROL_CONSOLE_ISOLATED_TEST') == '1'
 
 import rclpy
+from bag_helpers import read_bag
 from ament_index_python.packages import get_package_prefix
 from nav_msgs.msg import Odometry
 from std_msgs.msg import Float32MultiArray
@@ -39,7 +40,7 @@ class FakeInput:
 def run():
     out = Path(os.environ.get('STOP_MONITOR_TEST_OUT', '/evidence/stop-monitor'))
     out.mkdir(parents=True, exist_ok=True)
-    prior_journals = set((out / 'runs').glob('*/messages.jsonl'))
+    prior_journals = set((out / 'runs').glob('*/metadata.json'))
     env = dict(os.environ, ROS_LOG_DIR=str(out / 'ros'))
     log = (out / 'monitor.log').open('w')
     process = subprocess.Popen([get_package_prefix('vehicle_recorder') + '/lib/vehicle_recorder/stop_observer',
@@ -118,7 +119,10 @@ def run():
         spin(0.15)
         for s in sockets:
             packet = s.recv(100)
-            assert struct.unpack('<iiB', packet) == (9, 0, 128)
+            # Current shared wire contract: float32 degrees, float32 RPM, uint8 misc.
+            degrees, rpm, misc = struct.unpack('<ffB', packet)
+            assert math.isclose(degrees, -6.37875, abs_tol=1e-5)
+            assert rpm == 0.0 and misc == 128
         first_command = ns(values['status'].command_stamp)
         first_transmit = ns(values['status'].transmit_stamp)
         assert first_command > 0 and first_transmit >= first_command
@@ -163,9 +167,9 @@ def run():
         executor.shutdown()
         for s in sockets: s.close()
         log.close()
-    files = [p for p in (out / 'runs').glob('*/messages.jsonl') if p not in prior_journals]
+    files = [p for p in (out / 'runs').glob('*/metadata.json') if p not in prior_journals]
     assert files
-    journal = [json.loads(line) for line in files[0].read_text().splitlines()]
+    journal = read_bag(files[0].parent)
     commands = [e['data'] for e in journal if e.get('topic') == '/vehicle/command_events']
     assert any(e['stage'] == CommandEvent.COMMAND and e['brake'] for e in commands)
     assert any(e['stage'] == CommandEvent.TRANSMITTED and e['brake'] for e in commands)

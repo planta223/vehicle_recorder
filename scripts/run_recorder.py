@@ -1,53 +1,30 @@
-"""Buffered observation journal. Source messages and receipt times stay separate."""
-import csv
+"""Low-rate session metadata/UI; ROS payloads are handled only by the C++ backend."""
 from datetime import datetime
 import hashlib
 import json
-import math
 from pathlib import Path
-import queue
+import re
 import shutil
-import threading
-import time
 import uuid
 
-from rosidl_runtime_py.convert import message_to_ordereddict
-
-
-def clean(value):
-    if isinstance(value, dict):
-        return {key: clean(item) for key, item in value.items()}
-    if isinstance(value, (tuple, list)):
-        return [clean(item) for item in value]
-    if isinstance(value, float) and not math.isfinite(value):
-        return None
-    return value
-
-
-def flatten(value, prefix=''):
-    row = {}
-    for key, item in value.items():
-        name = prefix + key
-        if isinstance(item, dict):
-            row.update(flatten(item, name + '.'))
-        elif isinstance(item, (tuple, list)):
-            row[name] = json.dumps(item, separators=(',', ':'), allow_nan=False)
-        else:
-            row[name] = item
-    return row
+from ament_index_python.packages import get_package_share_directory
 
 
 class RunRecorder:
-    def __init__(self, root, metadata, capacity=4096, snapshot_files=()):
-        if capacity <= 0:
-            raise ValueError('record_queue_size must be positive')
+    def __init__(self, root, metadata, snapshot_files=()):
         self.directory = Path(root) / (datetime.now().strftime('%Y%m%dT%H%M%S') + '-' + uuid.uuid4().hex[:8])
         self.directory.mkdir(parents=True)
+        self.metadata_path = self.directory / 'metadata.json'
         self.metadata = dict(metadata, created_at=datetime.now().astimezone().isoformat(),
-                             nonfinite_policy='JSON null; source validity is preserved',
-                             clock='source_stamp_ns and received_ros_ns: ROS time; received_monotonic_ns: local monotonic',
-                             complete=False, review_status='pending', record_name=None,
-                             snapshots=[], snapshot_errors=[])
+            storage='rosbag2/sqlite3', serialization='cdr (unmodified serialized ROS messages)',
+            clock='bag timestamp and receipts.received_ros_ns: ROS time; receipts.received_monotonic_ns: CLOCK_MONOTONIC',
+            nonfinite_policy='preserve original CDR bits, including NaN/Inf',
+            complete=False, review_status='pending', record_name=None,
+            acquisition_lossless_verified=False,
+            completeness_scope='complete checks local storage and reported DDS errors; it does not prove upstream delivery',
+            snapshots=[], snapshot_errors=[], interfaces=[], interface_errors=[])
+        self.closed = False
+        self.interface_packages = set()
         for index, filename in enumerate(snapshot_files):
             try:
                 source = Path(filename)
@@ -58,94 +35,61 @@ class RunRecorder:
                     sha256=hashlib.sha256(dest.read_bytes()).hexdigest()))
             except OSError as error:
                 self.metadata['snapshot_errors'].append(dict(source=filename, error=str(error)))
-        self.pending = queue.Queue(maxsize=capacity)
-        self.stopping = threading.Event()
-        self.written = self.dropped = 0
-        self.errors = []
-        self.files = {}
-        self.metadata_path = self.directory / 'metadata.json'
-        self.metadata_path.write_text(json.dumps(self.metadata, ensure_ascii=False, indent=2) + '\n')
-        self.thread = threading.Thread(target=self._write, name='monitor-recorder', daemon=True)
-        self.thread.start()
+        self.save()
 
-    def offer(self, item):
-        if self.stopping.is_set():
-            self.dropped += 1
-            return False
-        try:
-            self.pending.put_nowait(item)
-            return True
-        except queue.Full:
-            self.dropped += 1
-            return False
+    def save(self):
+        temporary = self.metadata_path.with_suffix('.json.tmp')
+        temporary.write_text(json.dumps(self.metadata, ensure_ascii=False, indent=2) + '\n')
+        temporary.replace(self.metadata_path)
 
-    def message(self, topic, type_name, msg, received_ros_ns):
-        header = getattr(msg, 'header', None)
-        stamp = getattr(header, 'stamp', None)
-        source = (stamp.sec * 10**9 + stamp.nanosec if stamp is not None and
-                  stamp.sec >= 0 and 0 <= stamp.nanosec < 10**9 else None)
-        return self.offer(dict(kind='message', topic=topic, type=type_name, source_stamp_ns=source,
-                               received_ros_ns=received_ros_ns, received_monotonic_ns=time.monotonic_ns(),
-                               message=msg))
-
-    def _write(self):
-        streams, writers = {}, {}
-        try:
-            with (self.directory / 'messages.jsonl').open('w') as events:
-                last_flush = time.monotonic()
-                while not self.stopping.is_set() or not self.pending.empty():
-                    try:
-                        item = self.pending.get(timeout=0.2)
-                    except queue.Empty:
-                        item = None
-                    if item is not None:
-                        try:
-                            item = dict(item)
-                            if item['kind'] == 'message':
-                                item['data'] = clean(message_to_ordereddict(item.pop('message')))
-                                identity = (item['topic'], item['type'])
-                                row = {key: item[key] for key in ('source_stamp_ns', 'received_ros_ns', 'received_monotonic_ns')}
-                                row.update(flatten(item['data']))
-                                if identity not in writers:
-                                    suffix = hashlib.sha256('|'.join(identity).encode()).hexdigest()[:8]
-                                    filename = 'topic-' + suffix + '.csv'
-                                    stream = (self.directory / filename).open('w', newline='')
-                                    streams[identity] = stream
-                                    writers[identity] = csv.DictWriter(stream, fieldnames=list(row))
-                                    writers[identity].writeheader()
-                                    self.files[filename] = dict(topic=identity[0], type=identity[1])
-                                writers[identity].writerow(row)
-                            else:
-                                item = clean(item)
-                            events.write(json.dumps(item, ensure_ascii=False, allow_nan=False, separators=(',', ':')) + '\n')
-                            self.written += 1
-                        except Exception as error:
-                            self.errors.append(str(error))
-                        finally:
-                            self.pending.task_done()
-                    if time.monotonic() - last_flush >= 1.0:
-                        events.flush()
-                        for stream in streams.values():
-                            stream.flush()
-                        last_flush = time.monotonic()
-        except Exception as error:
-            self.errors.append(str(error))
-            self.stopping.set()
-        finally:
-            for stream in streams.values():
-                stream.close()
-            self.metadata.update(written=self.written, dropped=self.dropped, errors=self.errors,
-                                 pending=self.pending.qsize(), files=self.files,
-                                 complete=not self.errors and not self.dropped and self.pending.empty())
+    def preserve_interfaces(self, type_names):
+        """Archive installed definitions and dependencies once, outside the acquisition process."""
+        pending = [name.split('/')[0] for name in type_names]
+        while pending:
+            package = pending.pop()
+            if package in self.interface_packages:
+                continue
+            self.interface_packages.add(package)
             try:
-                self.metadata_path.write_text(json.dumps(self.metadata, ensure_ascii=False, indent=2) + '\n')
-            except OSError as error:
-                self.errors.append(str(error))
+                share = Path(get_package_share_directory(package))
+                xml = share / 'package.xml'
+                # A dependency may be a plain library with no message definitions.
+                definitions = [d for d in ('msg', 'srv', 'action') if (share / d).is_dir()]
+                if not definitions:
+                    if package in [t.split('/')[0] for t in type_names]:
+                        raise FileNotFoundError('No installed interface definitions: ' + package)
+                    continue
+                files = [xml] + [p for d in definitions for p in (share / d).rglob('*')
+                                 if p.is_file() and p.suffix in ('.msg', '.idl', '.srv', '.action')]
+                for source in files:
+                    dest = self.directory / 'interfaces' / package / source.relative_to(share)
+                    dest.parent.mkdir(parents=True, exist_ok=True)
+                    shutil.copy2(source, dest)
+                    self.metadata['interfaces'].append(dict(file=str(dest.relative_to(self.directory)),
+                        sha256=hashlib.sha256(dest.read_bytes()).hexdigest()))
+                    if source.suffix in ('.msg', '.srv', '.action'):
+                        for line in source.read_text().splitlines():
+                            match = re.match(r'\s*([A-Za-z]\w*)/', line)
+                            if match:
+                                pending.append(match[1])
+                    elif source.suffix == '.idl':
+                        pending.extend(re.findall(r'#include\s+"([A-Za-z]\w*)/', source.read_text()))
+            except Exception as error:
+                self.metadata['interface_errors'].append(dict(package=package, error=str(error)))
 
-    def close(self):
-        self.stopping.set()
-        self.thread.join(timeout=10)
-        return not self.thread.is_alive() and not self.errors and not self.dropped
+    def close(self, report, returncode):
+        self.closed = True
+        self.metadata['backend'] = report
+        self.metadata['backend_returncode'] = returncode
+        self.metadata['undiscovered_topics'] = sorted(set(report.get('requested_topics', [])) -
+                                                     set(report.get('topics', {})))
+        self.metadata['written'] = report.get('written', 0)
+        self.metadata['dropped'] = report.get('queue_overflow', 0)
+        self.metadata['errors'] = report.get('errors', [])
+        self.metadata['complete'] = bool(returncode == 0 and report.get('complete') and
+            not self.metadata['snapshot_errors'] and not self.metadata['interface_errors'])
+        self.save()
+        return self.metadata['complete']
 
     @staticmethod
     def validate_name(name):
@@ -154,21 +98,18 @@ class RunRecorder:
             raise ValueError('빈 이름·경로 구분자·제어문자는 사용할 수 없습니다. 120바이트 이내로 입력해주세요.')
 
     def review(self, normal, name=None):
-        if self.thread.is_alive():
+        if not self.closed:
             raise RuntimeError('기록 저장이 끝나기 전에는 검토할 수 없습니다.')
         if normal:
             self.validate_name(name)
+        target = self.directory.with_name(self.directory.name + '-' + name) if normal else self.directory
+        if normal and target.exists():
+            raise FileExistsError(str(target))
         self.metadata.update(review_status='accepted' if normal else 'rejected',
                              record_name=name if normal else None,
                              reviewed_at=datetime.now().astimezone().isoformat())
-        # The operator's assessment is separate from complete/dropped/errors.
-        temporary = self.metadata_path.with_suffix('.json.tmp')
-        temporary.write_text(json.dumps(self.metadata, ensure_ascii=False, indent=2) + '\n')
-        temporary.replace(self.metadata_path)
+        self.save()
         if normal:
-            target = self.directory.with_name(self.directory.name + '-' + name)
-            if target.exists():
-                raise FileExistsError(str(target))
             self.directory.rename(target)
             self.directory = target
             self.metadata_path = target / 'metadata.json'
