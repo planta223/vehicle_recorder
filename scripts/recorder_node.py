@@ -16,7 +16,10 @@ from run_recorder import RunRecorder
 from path_monitor import PathMonitor
 
 
-TOPICS = ['/gnss/odom', '/control/global_pose', '/control/motion_state',
+# 고규범 수정 (2026-10-21): 원본 전체는 test_runs/remote-brake-*/before에 보존.
+# TOPICS 시작은 ['/gnss/odom', '/control/global_pose', '/control/motion_state', ...]였음.
+# 고규범 신규 로직: 시험 이벤트도 기존 비동기 writer로 기록. 제어 명령 발행 없음.
+TOPICS = ['/vehicle/brake_test', '/gnss/odom', '/control/global_pose', '/control/motion_state',
           '/control/pp_diagnostic', '/control/auto_cmd', '/control/selected_cmd',
           '/control/actuator_raw', '/control/status', '/control/stop_status',
           '/vehicle/stop_status', '/vehicle/command_events', '/motor_feedback', '/steering_feedback']
