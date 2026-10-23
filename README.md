@@ -54,9 +54,8 @@ standalone 결과 토픽은 `/vehicle/stop_status`, control_manager 결과는 `/
 `Ctrl+C`/SIGTERM이나 터미널 없는 자동 실행은 기존처럼 파일을 닫고 미검토로 남긴다.
 자동 실행에서 터미널 입력을 사용하지 않으려면 `-p interactive_review:=false`를 지정한다.
 launch 자식 노드도 `/dev/tty`를 통해 같은 대화형 터미널에서 조작할 수 있다.
-제동 시험 지원 launch에서 `q`로 기록 검토를 마치면 기록 노드만 종료한다.
-정지 관측·trans와 지원 launch는 계속 실행된다. 지원 노드도 종료하려면 차량 정지와
-시험 조작 터미널 종료를 확인한 뒤 지원 launch 터미널에서 `Ctrl+C`를 누른다.
+제동 시험 지원 launch에서는 시험 조작 터미널의 정지·종료를 확인한 뒤 기록을 종료한다.
+기록 검토가 끝나면 지원 launch의 정지 관측·trans도 자동 종료된다.
 
 기본 `/workspace/log/vehicle_recorder/<실행별 폴더>/`는 호스트
 `main/log/vehicle_recorder/<실행별 폴더>/`에 보존된다.
