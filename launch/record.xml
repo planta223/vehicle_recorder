@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<launch>
+  <arg name="params_file" default="$(find-pkg-share vehicle_recorder)/config/record.yaml"/>
+  <node pkg="vehicle_recorder" exec="record" name="vehicle_recorder" output="screen">
+    <param from="$(var params_file)"/>
+  </node>
+</launch>

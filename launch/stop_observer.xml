@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<launch>
+  <!-- 고규범 신규 로직 (2026-10-21): reusable, observation-only standalone entrypoint. -->
+  <arg name="command_topic" default="/cmd"/>
+  <arg name="gnss_topic" default="/gnss/odom"/>
+  <arg name="status_topic" default="/vehicle/stop_status"/>
+  <arg name="stop_speed_mps" default="0.1"/>
+  <arg name="stop_hold_s" default="0.5"/>
+  <arg name="sample_timeout_s" default="0.3"/>
+  <node pkg="vehicle_recorder" exec="stop_observer" name="stop_monitor" output="screen">
+    <param name="command_topic" value="$(var command_topic)"/>
+    <param name="gnss_topic" value="$(var gnss_topic)"/>
+    <param name="status_topic" value="$(var status_topic)"/>
+    <param name="stop_speed_mps" value="$(var stop_speed_mps)" type="float"/>
+    <param name="stop_hold_s" value="$(var stop_hold_s)" type="float"/>
+    <param name="sample_timeout_s" value="$(var sample_timeout_s)" type="float"/>
+  </node>
+</launch>

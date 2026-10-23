@@ -1,0 +1,20 @@
+/vehicle_recorder:
+  ros__parameters:
+    log_root: /workspace/log/vehicle_recorder
+    record_queue_size: 4096
+    reference_path_topic: /control/reference_path
+    snapshot_files: [""]
+    topics:
+      - /gnss/odom
+      - /control/global_pose
+      - /control/motion_state
+      - /control/pp_diagnostic
+      - /control/auto_cmd
+      - /control/selected_cmd
+      - /control/actuator_raw
+      - /control/status
+      - /control/stop_status
+      - /vehicle/stop_status
+      - /vehicle/command_events
+      - /motor_feedback
+      - /steering_feedback
