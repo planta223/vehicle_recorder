@@ -20,7 +20,8 @@ from record_terminal import RecordTerminal
 TOPICS = ['/vehicle/brake_test', '/gnss/odom', '/control/global_pose', '/control/motion_state',
           '/control/pp_diagnostic', '/control/auto_cmd', '/control/selected_cmd',
           '/control/actuator_raw', '/control/status', '/control/stop_status',
-          '/vehicle/stop_status', '/vehicle/command_events', '/motor_feedback', '/steering_feedback']
+          '/vehicle/stop_status', '/vehicle/command_events', '/motor_feedback', '/steering_feedback',
+          '/sensors/detectTraffic', '/control/sensors/traffic']
 
 
 def read_report(directory):

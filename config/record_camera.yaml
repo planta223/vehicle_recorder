@@ -1,0 +1,17 @@
+# Separate process/queue from control recording. Preserve CompressedImage CDR,
+# including the camera's original header timestamp; no decode or re-encoding.
+/**:
+  ros__parameters:
+    log_root: /workspace/log/autonomy_new_20261025/camera_records
+    record_queue_size: 64
+    record_queue_bytes: 33554432
+    subscription_depth: 8
+    interactive_review: true
+    reference_path_topic: ""
+    topics:
+      - /camera/image_raw/compressed
+    snapshot_files:
+      - /workspace/src/vehicle_recorder/config/record_camera.yaml
+      - /workspace/src/camera/camera/config.py
+      - /workspace/src/camera/camera/camera_node.py
+      - /workspace/tools/record_camera.sh

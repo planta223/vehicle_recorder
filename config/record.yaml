@@ -8,6 +8,8 @@
     snapshot_files: [""]
     topics:
       - /gnss/odom
+      - /sensors/detectTraffic
+      - /control/sensors/traffic
       - /control/global_pose
       - /control/motion_state
       - /control/pp_diagnostic

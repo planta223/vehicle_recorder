@@ -97,6 +97,31 @@ standalone 결과 토픽은 `/vehicle/stop_status`, control_manager 결과는 `/
 
 ## 저장
 
+기본 기록과 control_manager의 `record_test.yaml`은 `/sensors/detectTraffic` 및
+`/control/sensors/traffic`도 기록한다. 원본 인식 결과와 Sensor Interface 전달 결과의
+전체 CDR·영상 timestamp·Unknown·valid=false를 보존한다. 이 구독은 제어 판단을 수행하지 않는다.
+발행자가 없으면 `undiscovered_topics`에 남으므로 `complete`와 함께 발견·저장 건수를 확인한다.
+
+### 별도 카메라 기록 (2026-10-25)
+
+현재 통합 워크스페이스에서는 기존 센서·제어 기록을 유지하고 다음을 별도 터미널에서 실행한다.
+이미 `/camera/image_raw/compressed`를 발행하는 카메라가 있어야 한다.
+
+```bash
+export TEST_ROOT=/workspace/log/autonomy_new_20261025
+bash /workspace/tools/record_camera.sh
+```
+
+`config/record_camera.yaml`로 동일 C++ backend를 별도 프로세스로 실행한다.
+압축 영상만 원래 CDR·헤더 시각 그대로 `camera_records/`에 보존하며, 경로는 구독하지 않는다.
+카메라 큐는 64개/32MiB, DDS depth는 8이고 CPU nice는 10이다.
+카메라 기록 실패가 기존 센서·제어 기록 프로세스를 종료하지 않는다.
+CPU·디스크 등 공유 자원에 의한 주기 영향은 별도 비교 시험이 필요하다.
+운용 명령과 종료 후 확인은 통합 저장소의
+`control_manager/doc/10월25일테스트카메라추가.md`에 정리했다.
+
+### 공통 저장 형식
+
 대화형 터미널(`docker exec -it main bash`)에서는 `q` 또는 `Q` 한 번으로 기록을
 종료한다. 대기 중인 파일 쓰기를 마친 뒤 `정상적인 기록입니까? y/n:`을 묻는다.
 `y`를 입력하면 `기록 이름을 입력해주세요.`가 표시되고, 입력한 이름을 기존 실행
